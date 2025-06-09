@@ -1,12 +1,18 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'bitnami/kubectl:latest'  // 👈 lightweight image with kubectl
+        }
+    }
     environment {
         KUBECONFIG_CRED = credentials('kubeconfig-minikube')
     }
     stages {
         stage('Checkout') {
             steps {
-                git credentialsId: 'github-creds', url: 'https://github.com/vishrokade/k8s-hello-app.git', branch: 'main'
+                git credentialsId: 'github-creds',
+                    url: 'https://github.com/vishrokade/k8s-hello-app.git',
+                    branch: 'main'
             }
         }
         stage('Deploy to Kubernetes') {
