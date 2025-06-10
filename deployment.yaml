@@ -18,11 +18,11 @@ spec:
           ports:
             - containerPort: 8080
           env:
-            - name: ENV
-              value: "local"
+            - name: APP_ENV
+              value: "production"
           volumeMounts:
-            - name: temp-storage
-              mountPath: /usr/share/data
+            - mountPath: /data
+              name: data-volume
       volumes:
-        - name: temp-storage
+        - name: data-volume
           emptyDir: {}

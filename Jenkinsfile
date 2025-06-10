@@ -1,32 +1,35 @@
-pipeline {
-    agent {
-        docker {
-            image 'bitnami/kubectl:latest'  // 👈 lightweight image with kubectl
-        }
-    }
+pipeline 
+    agent any
+
     environment {
-        KUBECONFIG_CRED = credentials('kubeconfig-minikube')
+        KUBECONFIG_CRED_ID = 'kubeconfig'
     }
+
     stages {
         stage('Checkout') {
             steps {
-                git credentialsId: 'github-creds',
-                    url: 'https://github.com/vishrokade/k8s-hello-app.git',
-                    branch: 'main'
+                git 'https://github.com/vishrokade/jenkins-k8s-lab.git'
             }
         }
+
         stage('Deploy to Kubernetes') {
             steps {
-                withCredentials([file(credentialsId: 'kubeconfig-minikube', variable: 'KUBECONFIG')]) {
-                    sh 'kubectl apply -f deployment.yaml'
-                    sh 'kubectl apply -f service.yaml'
+                withCredentials([file(credentialsId: env.KUBECONFIG_CRED_ID, variable: 'KUBECONFIG')]) {
+                    sh '''
+                        export KUBECONFIG=$KUBECONFIG
+                        kubectl apply -f deployment.yaml
+                        kubectl apply -f service.yaml
+                    '''
                 }
             }
         }
-        stage('Test Application') {
+
+        stage('Test Deployment') {
             steps {
-                sh 'kubectl get pods'
-                sh 'kubectl get svc'
+                sh '''
+                    kubectl get pods
+                    kubectl get svc hello-service
+                '''
             }
         }
     }
