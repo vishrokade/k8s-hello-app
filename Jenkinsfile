@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/vishrokade/jenkins-k8s-lab.git'
+                git credentialsId: 'github-creds', url: 'https://github.com/vishrokade/jenkins-k8s-lab.git'
             }
         }
 
